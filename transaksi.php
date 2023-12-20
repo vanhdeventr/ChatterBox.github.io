@@ -1,34 +1,51 @@
 <?php
-include "../koneksi.php";
-session_start();
-$nama = $_SESSION["nama"];
-$tanggal = date("Y-m-d");
+include "../../koneksi.php";
 
-$id_produk = $_POST["id_produk"];
-$email = $_POST["email"];
-$user_game_id = $_POST["user_game_id"];
+// Mengambil id transaksi dari url
+$id_transaksi = $_GET["id_transaksi"];
 
-// Mengambil data produk berdasarkan id produk
-$query = "SELECT * FROM produk JOIN game ON produk.id_game = game.id_game WHERE id_produk = $id_produk";
-$ambilData = mysqli_query($koneksi, $query);
-$data = mysqli_fetch_array($ambilData);
-
-$nama_game = $data["nama_game"];
-$nama_produk = $data["nama_produk"];
-$harga_produk = $data["harga_produk"];
-
-// Tambah data transaksi
-$query = "INSERT INTO transaksi VALUES('', '$tanggal', '$user_game_id', '$nama', '$email', '$nama_game', '$nama_produk', '$harga_produk')";
-$tambahData = mysqli_query($koneksi, $query);
-
-// Mengambil id transaksi
-$query = "SELECT id_transaksi FROM transaksi ORDER BY id_transaksi DESC";
+// Mengambil data transaksi
+$query = "SELECT * FROM transaksi WHERE id_transaksi = $id_transaksi";
 $cekData = mysqli_query($koneksi, $query);
-$dataTransaksi = mysqli_fetch_array($cekData);
-$id_transaksi = $dataTransaksi["id_transaksi"];
+$data = mysqli_fetch_array($cekData);
+?>
 
-// Mengurangi jumlah produk
-$query = "UPDATE produk SET jumlah_produk = jumlah_produk-1 WHERE id_produk = $id_produk";
-$kurangData = mysqli_query($koneksi, $query);
+<!DOCTYPE html>
+<html lang="en">
 
-header("location: transaksi/transaksi.php?id_transaksi=$id_transaksi");
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transaksi</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background: url("image/transaksi.jpeg") no-repeat;
+      background-size: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <br /><br />
+  <div class="container">
+    <h3>Transaksi Berhasil</h3>
+    <br /><br />
+    <div class="image-container">
+      <img src="image/centang.png" alt="" class="image" />
+    </div>
+    <h4 class="harga">IDR <?= number_format($data["harga_produk"], 0, ",", ".") ?></h4>
+    <div class="table">
+      <h4>Nama Game : <?= $data["nama_game"] ?></h4>
+      <h4>ID Game : <?= $data["user_game_id"] ?></h4>
+      <h4>Item : <?= $data["nama_produk"] ?></h4>
+      <h4>Email : <?= $data["email_pembeli"] ?></h4>
+    </div>
+    <br /><br />
+    <a href="../game.php">
+      <button><span>Tutup</span></button>
+    </a>
+  </div>
+</body>
+
+</html>
